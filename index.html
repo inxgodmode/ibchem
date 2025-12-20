@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IB Chemistry SL 2025 - Structure 1 & 2</title>
+    <style>
+        :root {
+            --primary: #58cc02; /* Duo Green */
+            --primary-dark: #46a302;
+            --wrong: #ff4b4b;
+            --wrong-dark: #ea2b2b;
+            --bg: #131f24;
+            --card-bg: #202f36;
+            --text: #ffffff;
+            --subtext: #afb6b9;
+            --border: #37464f;
+        }
+
+        body {
+            font-family: 'Nunito', 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            /* Prevent text selection */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+            color: var(--subtext);
+            font-weight: bold;
+        }
+
+        .progress-container {
+            height: 16px;
+            background-color: var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .timer { color: #1cb0f6; }
+        .streak { color: #ff9600; }
+
+        /* Question Area */
+        .question-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto; 
+            padding-bottom: 20px;
+        }
+
+        #q-topic {
+            font-size: 0.85rem;
+            color: var(--subtext);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            margin: 0 0 25px 0;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: var(--bg);
+            border: 2px solid var(--border);
+            border-bottom-width: 4px;
+            border-radius: 16px;
+            padding: 15px 20px;
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.1s;
+            position: relative;
+        }
+
+        .option-btn:hover:not(:disabled) { background-color: var(--card-bg); }
+        .option-btn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; }
+
+        .option-btn.selected {
+            border-color: #1cb0f6;
+            background-color: rgba(28, 176, 246, 0.15);
+        }
+
+        .option-btn.correct {
+            border-color: var(--primary);
+            background-color: rgba(88, 204, 2, 0.15);
+            color: var(--primary);
+        }
+
+        .option-btn.wrong {
+            border-color: var(--wrong);
+            background-color: rgba(255, 75, 75, 0.15);
+            color: var(--wrong);
+            opacity: 0.7;
+        }
+
+        /* Footer / Feedback */
+        footer {
+            min-height: 160px;
+            border-top: 2px solid var(--border);
+            margin: 0 -20px -20px -20px;
+            padding: 20px 25px;
+            display: none; 
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        footer.correct { background-color: #132e18; border-color: var(--primary-dark); display: flex; }
+        footer.wrong { background-color: #2e1515; border-color: var(--wrong-dark); display: flex; }
+
+        .feedback-header {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .correct .feedback-header { color: var(--primary); }
+        .wrong .feedback-header { color: var(--wrong); }
+
+        .explanation {
+            font-size: 0.95rem;
+            color: #efefef;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .check-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            border-bottom: 4px solid;
+            transition: filter 0.2s;
+        }
+
+        #main-action-btn {
+            margin-top: 10px;
+            background-color: var(--primary);
+            border-color: var(--primary-dark);
+            color: white;
+            display: none; 
+        }
+        
+        #main-action-btn:disabled {
+            background-color: var(--border);
+            border-color: #2b363d;
+            color: var(--subtext);
+            cursor: default;
+        }
+
+        footer .continue-btn {
+            background-color: var(--primary);
+            border-color: var(--primary-dark);
+            color: white;
+        }
+        
+        footer.wrong .continue-btn {
+            background-color: var(--wrong);
+            border-color: var(--wrong-dark);
+        }
+
+        /* Screens */
+        .screen { display: none; height: 100%; flex-direction: column; }
+        .screen.active { display: flex; }
+
+        .start-screen, .end-screen {
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .big-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-bottom: 5px solid var(--primary-dark);
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        
+        .big-btn:active { transform: translateY(3px); border-bottom-width: 2px; }
+
+        .summary-stat {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+        }
+
+    </style>
+    <!-- Protection Script -->
+    <script>
+        // Disable Right Click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Disable Inspect Shortcuts
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) { return false; } // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } // Ctrl+Shift+I
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; } // Ctrl+Shift+C
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; } // Ctrl+Shift+J
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } // Ctrl+U
+        }
+    </script>
+</head>
+<body oncontextmenu="return false;">
+
+<div id="app">
+    
+    <!-- Start Screen -->
+    <div id="start-screen" class="screen active start-screen">
+        <h1 style="color: var(--primary); margin-bottom: 10px;">IB Chemistry SL 2025</h1>
+        <h2 style="color: white; font-size: 1.2rem; margin-top:0;">Paper 1A Mock</h2>
+        <div style="background: var(--card-bg); padding: 20px; border-radius: 16px; text-align: left; width: 100%; max-width: 350px;">
+            <p>📚 <strong>Topics:</strong> Structure 1 & Structure 2</p>
+            <p>❓ <strong>Questions:</strong> 60 Questions</p>
+            <p>⏱️ <strong>Time Limit:</strong> 1 Hour 30 Minutes</p>
+            <p>🚫 <strong>Rules:</strong> No Calculator Allowed</p>
+        </div>
+        <button class="big-btn" onclick="game.start()">START QUIZ</button>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen" class="screen">
+        <header>
+            <div class="stats-bar">
+                <span class="timer" id="timer">01:30:00</span>
+                <span class="streak" id="streak">🔥 0</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </header>
+
+        <div class="question-area">
+            <span id="q-topic">Structure 1.1</span>
+            <h2 id="q-text">Question loading...</h2>
+            
+            <div class="options-grid" id="options-container">
+                <!-- Options injected here -->
+            </div>
+        </div>
+
+        <button id="main-action-btn" class="check-btn" onclick="game.checkAnswer()" disabled>CHECK ANSWER</button>
+    </div>
+
+    <!-- Footer Feedback (Overlays bottom) -->
+    <footer id="feedback-footer">
+        <div class="feedback-header" id="feedback-title">Correct!</div>
+        <div class="explanation" id="feedback-explanation">Explanation text...</div>
+        <button class="check-btn continue-btn" onclick="game.nextQuestion()">CONTINUE</button>
+    </footer>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="screen end-screen">
+        <h1>Quiz Complete!</h1>
+        <p style="color: var(--subtext); margin-bottom: 20px;">Here is how you performed:</p>
+        <div class="summary-stat">
+            <span>Score</span>
+            <span id="final-score" style="color: var(--primary); font-weight:bold;">0 / 60</span>
+        </div>
+        <div class="summary-stat">
+            <span>Accuracy</span>
+            <span id="final-percent">0%</span>
+        </div>
+        <div class="summary-stat">
+            <span>Time Taken</span>
+            <span id="final-time">00:00</span>
+        </div>
+        <button class="big-btn" onclick="location.reload()">TRY AGAIN</button>
+    </div>
+
+</div>
+
+<script>
+/* 
+  DATABASE: 60 Questions (30 Structure 1, 30 Structure 2)
+  Includes explanations for every question.
+*/
+
+const db = [
+    // --- STRUCTURE 1: Particulate Nature (1.1) ---
+    {
+        q: "Which change of state is exothermic?",
+        options: ["Melting", "Sublimation", "Evaporation", "Deposition"],
+        correct: 3,
+        topic: "Structure 1.1",
+        explanation: "Exothermic processes release energy. Deposition (gas to solid) releases energy as particles lose kinetic energy to form attractive forces."
+    },
+    {
+        q: "What is the temperature in Kelvin of 25°C?",
+        options: ["248 K", "298 K", "273 K", "25 K"],
+        correct: 1,
+        topic: "Structure 1.1",
+        explanation: "K = °C + 273. 25 + 273 = 298 K."
+    },
+    {
+        q: "Which state of matter has a fixed volume but no fixed shape?",
+        options: ["Solid", "Liquid", "Gas", "Plasma"],
+        correct: 1,
+        topic: "Structure 1.1",
+        explanation: "Liquids have a fixed volume but take the shape of their container. Solids have fixed shape and volume; gases have neither."
+    },
+    {
+        q: "A mixture of salt and water is best described as:",
+        options: ["Heterogeneous", "Homogeneous", "A pure compound", "An element"],
+        correct: 1,
+        topic: "Structure 1.1",
+        explanation: "Salt fully dissolves in water to form a solution with uniform composition throughout, making it homogeneous."
+    },
+    // --- STRUCTURE 1: Nuclear Atom (1.2) ---
+    {
+        q: "Which subatomic particles are found in the nucleus?",
+        options: ["Protons only", "Electrons and protons", "Neutrons and protons", "Neutrons and electrons"],
+        correct: 2,
+        topic: "Structure 1.2",
+        explanation: "The nucleus contains nucleons, which are protons and neutrons. Electrons orbit the nucleus."
+    },
+    {
+        q: "Isotopes of an element differ in:",
+        options: ["Number of protons", "Number of electrons", "Number of neutrons", "Chemical properties"],
+        correct: 2,
+        topic: "Structure 1.2",
+        explanation: "Isotopes are atoms of the same element (same protons) with different mass numbers, meaning they have different numbers of neutrons."
+    },
+    {
+        q: "What is the relative atomic mass of an element with isotopes: 80% ⁶⁰X and 20% ⁶²X?",
+        options: ["60.2", "60.4", "61.0", "60.8"],
+        correct: 1,
+        topic: "Structure 1.2",
+        explanation: "Calculation: (0.80 × 60) + (0.20 × 62) = 48 + 12.4 = 60.4."
+    },
+    {
+        q: "How many neutrons are in the ion ³⁷Cl⁻?",
+        options: ["17", "18", "20", "37"],
+        correct: 2,
+        topic: "Structure 1.2",
+        explanation: "Chlorine has atomic number 17. Neutrons = Mass Number - Protons = 37 - 17 = 20."
+    },
+    {
+        q: "Which statement about the mass spectrum of Mg is correct?",
+        options: ["It shows the electron configuration", "It shows the number of valence electrons", "It gives the relative abundance of isotopes", "It shows the chemical reactivity"],
+        correct: 2,
+        topic: "Structure 1.2",
+        explanation: "A mass spectrometer separates isotopes by mass-to-charge ratio, allowing us to determine relative isotopic abundance."
+    },
+    // --- STRUCTURE 1: Electron Config (1.3) ---
+    {
+        q: "What is the full electron configuration of Nitrogen (Z=7)?",
+        options: ["1s² 2s² 2p³", "1s² 2s² 2p²", "1s² 2s¹ 2p⁴", "1s² 2p⁵"],
+        correct: 0,
+        topic: "Structure 1.3",
+        explanation: "Nitrogen has 7 electrons. Filling order: 1s (2), 2s (2), remaining 3 go into 2p."
+    },
+    {
+        q: "Which transition in the Hydrogen spectrum produces visible light?",
+        options: ["Lyman (to n=1)", "Balmer (to n=2)", "Paschen (to n=3)", "To n=∞"],
+        correct: 1,
+        topic: "Structure 1.3",
+        explanation: "Transitions falling to n=2 correspond to the Balmer series, which emits visible light."
+    },
+    {
+        q: "Which orbital is spherical in shape?",
+        options: ["s", "p", "d", "f"],
+        correct: 0,
+        topic: "Structure 1.3",
+        explanation: "s-orbitals are spherical; p-orbitals are dumbbell-shaped."
+    },
+    {
+        q: "What is the correct configuration for the Cr atom (Z=24)?",
+        options: ["[Ar] 4s² 3d⁴", "[Ar] 4s¹ 3d⁵", "[Ar] 3d⁶", "[Ar] 4s² 3d⁵"],
+        correct: 1,
+        topic: "Structure 1.3",
+        explanation: "Chromium is an exception. It promotes one 4s electron to 3d to achieve a stable half-filled d-sublevel."
+    },
+    {
+        q: "How many orbitals are there in the n=3 main energy level?",
+        options: ["3", "5", "9", "18"],
+        correct: 2,
+        topic: "Structure 1.3",
+        explanation: "Number of orbitals in level n is n². For n=3, 3² = 9 (one s, three p, five d)."
+    },
+    {
+        q: "Which species is isoelectronic with Ne?",
+        options: ["F", "Na", "Mg²⁺", "Cl⁻"],
+        correct: 2,
+        topic: "Structure 1.3",
+        explanation: "Ne has 10 electrons. Mg (12) loses 2 to form Mg²⁺, which has 10 electrons."
+    },
+    // --- STRUCTURE 1: The Mole (1.4) ---
+    {
+        q: "How many moles are in 8.0 g of NaOH? (Mr = 40)",
+        options: ["0.1 mol", "0.2 mol", "0.5 mol", "5.0 mol"],
+        correct: 1,
+        topic: "Structure 1.4",
+        explanation: "Moles = Mass / Mr = 8.0 / 40 = 0.2 mol."
+    },
+    {
+        q: "Which contains the most atoms?",
+        options: ["1 mol H", "1 mol H₂", "0.5 mol CH₄", "0.5 mol NH₃"],
+        correct: 2,
+        topic: "Structure 1.4",
+        explanation: "A: 1 mol. B: 2 mol atoms. C: 0.5 × 5 = 2.5 mol atoms. D: 0.5 × 4 = 2.0 mol atoms."
+    },
+    {
+        q: "Empirical formula of a compound C₂H₄O₂?",
+        options: ["CHO", "CH₂O", "C₂H₄O", "CH₃O"],
+        correct: 1,
+        topic: "Structure 1.4",
+        explanation: "Divide subscripts by the greatest common divisor (2). C(2/2)H(4/2)O(2/2) = CH₂O."
+    },
+    {
+        q: "Reaction: 2H₂ + O₂ → 2H₂O. If 4 mol H₂ react with 4 mol O₂, which is limiting?",
+        options: ["H₂", "O₂", "H₂O", "Neither"],
+        correct: 0,
+        topic: "Structure 1.4",
+        explanation: "H₂ requires 1:0.5 ratio or 2:1. 4 mol H₂ needs 2 mol O₂. We have 4 mol O₂ (excess). H₂ runs out first."
+    },
+    {
+        q: "What is the concentration of 0.5 mol solute in 250 cm³ solution?",
+        options: ["0.5 M", "1.0 M", "2.0 M", "0.002 M"],
+        correct: 2,
+        topic: "Structure 1.4",
+        explanation: "Conc = mol / vol(dm³). 250 cm³ = 0.25 dm³. 0.5 / 0.25 = 2.0 mol dm⁻³."
+    },
+    {
+        q: "Percentage by mass of O in CO₂? (C=12, O=16)",
+        options: ["27%", "50%", "73%", "33%"],
+        correct: 2,
+        topic: "Structure 1.4",
+        explanation: "Mr CO₂ = 44. Mass of O = 32. (32/44) × 100 ≈ 72.7%."
+    },
+    {
+        q: "Mass of 1 mole of carbon-12 atoms?",
+        options: ["1 g", "12 g", "12 kg", "6.02 x 10²³ g"],
+        correct: 1,
+        topic: "Structure 1.4",
+        explanation: "By definition, the mass of 1 mole of ¹²C is exactly 12 grams."
+    },
+    // --- STRUCTURE 1: Gases (1.5) ---
+    {
+        q: "What is the volume of 0.5 mol of gas at STP? (Molar vol = 22.7 dm³)",
+        options: ["11.35 dm³", "22.7 dm³", "45.4 dm³", "24.0 dm³"],
+        correct: 0,
+        topic: "Structure 1.5",
+        explanation: "Volume = n × Molar Vol = 0.5 × 22.7 = 11.35 dm³."
+    },
+    {
+        q: "According to Boyle's Law, if volume halves, pressure...",
+        options: ["Halves", "Doubles", "Triples", "Stays same"],
+        correct: 1,
+        topic: "Structure 1.5",
+        explanation: "P and V are inversely proportional at constant T. If V is /2, P must be x2."
+    },
+    {
+        q: "Ideal gases deviate from ideal behavior at:",
+        options: ["High T, Low P", "Low T, High P", "High T, High P", "Low T, Low P"],
+        correct: 1,
+        topic: "Structure 1.5",
+        explanation: "Real gases have volume and intermolecular forces. These become significant when particles are slow (Low T) and close together (High P)."
+    },
+    {
+        q: "Which graph represents the relationship between V and T (in K) for an ideal gas?",
+        options: ["Curve decreasing", "Straight line through origin", "Horizontal line", "Curve increasing"],
+        correct: 1,
+        topic: "Structure 1.5",
+        explanation: "Charles's Law states V ∝ T (Kelvin), which is a direct linear relationship passing through the origin."
+    },
+    {
+        q: "Which assumption of the kinetic molecular theory is NOT true for real gases?",
+        options: ["Particles move randomly", "Collisions are elastic", "Particles have no volume", "Kinetic energy depends on T"],
+        correct: 2,
+        topic: "Structure 1.5",
+        explanation: "Real gas particles do occupy space (have volume), whereas ideal gas particles are assumed to be point masses with zero volume."
+    },
+    {
+        q: "In the ideal gas equation PV=nRT, what is 'n'?",
+        options: ["Number of molecules", "Number of moles", "Neutrons", "Newtons"],
+        correct: 1,
+        topic: "Structure 1.5",
+        explanation: "n represents the amount of substance in moles."
+    },
+    {
+        q: "Avogadro's Law states that equal volumes of gases at same T and P have:",
+        options: ["Same mass", "Same density", "Same number of particles", "Same speed"],
+        correct: 2,
+        topic: "Structure 1.5",
+        explanation: "Avogadro's Law: V ∝ n. Equal volume implies equal moles (particles)."
+    },
+
+    // --- STRUCTURE 2: Ionic Bonding (2.1) ---
+    {
+        q: "An ionic bond is the electrostatic attraction between:",
+        options: ["Shared electrons", "Oppositely charged ions", "Nuclei and electrons", "Metal ions and delocalized electrons"],
+        correct: 1,
+        topic: "Structure 2.1",
+        explanation: "Ionic bonding is defined as the electrostatic attraction between positive (cations) and negative (anions) ions."
+    },
+    {
+        q: "Formula for Aluminum Oxide?",
+        options: ["AlO", "Al₂O₃", "AlO₂", "Al₃O₂"],
+        correct: 1,
+        topic: "Structure 2.1",
+        explanation: "Al is 3+, O is 2-. Cross charges to get neutral compound: Al₂O₃."
+    },
+    {
+        q: "Why do ionic compounds have high melting points?",
+        options: ["Covalent bonds are strong", "Strong electrostatic forces between ions", "Weak intermolecular forces", "Delocalized electrons"],
+        correct: 1,
+        topic: "Structure 2.1",
+        explanation: "A large amount of energy is required to break the strong lattice of electrostatic attractions between oppositely charged ions."
+    },
+    {
+        q: "Under what condition does NaCl conduct electricity?",
+        options: ["Solid only", "Solid and molten", "Molten and aqueous", "Never"],
+        correct: 2,
+        topic: "Structure 2.1",
+        explanation: "Ionic compounds conduct only when ions are free to move (molten or dissolved in water). In solid state, ions are fixed."
+    },
+    {
+        q: "Which ion is polyatomic?",
+        options: ["Cl⁻", "Mg²⁺", "NO₃⁻", "O²⁻"],
+        correct: 2,
+        topic: "Structure 2.1",
+        explanation: "Nitrate (NO₃⁻) contains multiple atoms (Nitrogen and Oxygen) covalently bonded but carrying a net charge."
+    },
+    // --- STRUCTURE 2: Covalent Bonding (2.2) ---
+    {
+        q: "A covalent bond involves:",
+        options: ["Transfer of electrons", "Sharing of electron pairs", "Delocalized electrons", "Magnetic attraction"],
+        correct: 1,
+        topic: "Structure 2.2",
+        explanation: "Covalent bonding is the electrostatic attraction between a shared pair of electrons and the positively charged nuclei."
+    },
+    {
+        q: "Which bond is the shortest?",
+        options: ["C-C single", "C=C double", "C≡C triple", "All are equal"],
+        correct: 2,
+        topic: "Structure 2.2",
+        explanation: "Triple bonds involve 3 shared pairs, creating a stronger pull between nuclei, resulting in the shortest bond length."
+    },
+    {
+        q: "Lewis structure of CO₂ has how many double bonds?",
+        options: ["0", "1", "2", "4"],
+        correct: 2,
+        topic: "Structure 2.2",
+        explanation: "O=C=O. Carbon forms two double bonds to satisfy the octet rule for all atoms."
+    },
+    {
+        q: "Shape of a molecule with 2 bonding pairs and 0 lone pairs (e.g., BeCl₂)?",
+        options: ["Bent", "Linear", "Trigonal Planar", "Tetrahedral"],
+        correct: 1,
+        topic: "Structure 2.2",
+        explanation: "The two electron domains repel maximally to 180°, creating a linear shape."
+    },
+    {
+        q: "Bond angle in a perfect tetrahedral molecule (e.g., CH₄)?",
+        options: ["90°", "107°", "109.5°", "120°"],
+        correct: 2,
+        topic: "Structure 2.2",
+        explanation: "Four electron domains arrange themselves to minimize repulsion, resulting in 109.5°."
+    },
+    {
+        q: "Why is the bond angle in water (104.5°) less than 109.5°?",
+        options: ["Bonding pairs repel more", "Lone pairs repel more than bonding pairs", "Oxygen is large", "Hydrogen is small"],
+        correct: 1,
+        topic: "Structure 2.2",
+        explanation: "Lone pairs occupy more space and repel more strongly than bonding pairs, squeezing the H-O-H bond angle down."
+    },
+    {
+        q: "Which molecule is polar?",
+        options: ["CH₄", "CO₂", "NH₃", "BF₃"],
+        correct: 2,
+        topic: "Structure 2.2",
+        explanation: "NH₃ is asymmetrical (pyramidal) with a dipole moment. The others are symmetrical, cancelling out dipoles."
+    },
+    {
+        q: "Which element is the most electronegative?",
+        options: ["Fluorine", "Chlorine", "Oxygen", "Carbon"],
+        correct: 0,
+        topic: "Structure 2.2",
+        explanation: "Fluorine is the most electronegative element on the periodic table (approx 4.0)."
+    },
+    {
+        q: "A coordinate (dative) covalent bond is formed when:",
+        options: ["Electrons are transferred", "Both shared electrons come from one atom", "It is between a metal and non-metal", "Hydrogens bond to Oxygen"],
+        correct: 1,
+        topic: "Structure 2.2",
+        explanation: "In a coordinate bond, the shared pair originates entirely from one of the bonding atoms (the donor)."
+    },
+    {
+        q: "Which molecule has resonance structures?",
+        options: ["H₂O", "O₃ (Ozone)", "CH₄", "NH₃"],
+        correct: 1,
+        topic: "Structure 2.2",
+        explanation: "Ozone has delocalized electrons across the O-O-O structure, represented by two equivalent resonance forms."
+    },
+    // --- STRUCTURE 2: Metallic (2.3) ---
+    {
+        q: "Metallic bonding is the attraction between:",
+        options: ["Positive ions and negative ions", "Positive ions and delocalized electrons", "Nuclei and shared pairs", "Neutral atoms"],
+        correct: 1,
+        topic: "Structure 2.3",
+        explanation: "Metallic bonding is the strong electrostatic attraction between a lattice of positive cations and a sea of delocalized electrons."
+    },
+    {
+        q: "Why are metals malleable?",
+        options: ["Layers of ions can slide over each other", "Strong covalent bonds hold them", "Electrons are fixed", "They are brittle"],
+        correct: 0,
+        topic: "Structure 2.3",
+        explanation: "The non-directional nature of the metallic bond allows layers of cations to slide without breaking the bond."
+    },
+    {
+        q: "Which metal would have the highest melting point?",
+        options: ["Na (+1, large radius)", "K (+1, larger radius)", "Mg (+2, small radius)", "Al (+3, small radius)"],
+        correct: 3,
+        topic: "Structure 2.3",
+        explanation: "Al has the highest charge (+3) and more delocalized electrons, creating the strongest attraction."
+    },
+    {
+        q: "An alloy is usually:",
+        options: ["Softer than pure metal", "Harder than pure metal", "Less conductive", "A chemical compound"],
+        correct: 1,
+        topic: "Structure 2.3",
+        explanation: "Different sized atoms in alloys disrupt the regular lattice, preventing layers from sliding easily (making it harder)."
+    },
+    {
+        q: "Which is NOT a property of typical metals?",
+        options: ["Good thermal conductivity", "Ductile", "Shiny (lustrous)", "Low melting point"],
+        correct: 3,
+        topic: "Structure 2.3",
+        explanation: "Most metals have high melting points due to strong metallic bonds (Mercury is a notable exception, but 'Low' is not a general property)."
+    },
+    // --- STRUCTURE 2: Materials/IMFs (2.4) ---
+    {
+        q: "Which is the weakest intermolecular force?",
+        options: ["Hydrogen bonding", "Dipole-dipole", "London dispersion forces", "Covalent bond"],
+        correct: 2,
+        topic: "Structure 2.4",
+        explanation: "London dispersion forces are temporary induced dipoles and are generally the weakest (though they increase with mass)."
+    },
+    {
+        q: "Hydrogen bonding occurs when H is bonded to:",
+        options: ["C, N, O", "N, O, F", "F, Cl, Br", "S, O, P"],
+        correct: 1,
+        topic: "Structure 2.4",
+        explanation: "H-bonding requires H connected to a highly electronegative atom: Nitrogen, Oxygen, or Fluorine."
+    },
+    {
+        q: "Graphite and Diamond are allotropes of:",
+        options: ["Silicon", "Carbon", "Sulfur", "Oxygen"],
+        correct: 1,
+        topic: "Structure 2.4",
+        explanation: "Both are Giant Covalent structures made entirely of Carbon atoms."
+    },
+    {
+        q: "Why does Graphite conduct electricity?",
+        options: ["It has delocalized electrons", "It is ionic", "It is a metal", "It has protons moving"],
+        correct: 0,
+        topic: "Structure 2.4",
+        explanation: "In graphite, each C is bonded to 3 others. The 4th electron is delocalized between layers, conducting electricity."
+    },
+    {
+        q: "Which substance is a Giant Covalent network?",
+        options: ["CO₂", "SiO₂ (Silica)", "H₂O", "I₂"],
+        correct: 1,
+        topic: "Structure 2.4",
+        explanation: "SiO₂ forms a continuous 3D lattice (quartz/sand), similar to diamond, unlike the others which are simple molecules."
+    },
+    {
+        q: "Why does water have a higher boiling point than H₂S?",
+        options: ["Water has London forces", "Water has Hydrogen bonding", "Water is heavier", "S is more electronegative"],
+        correct: 1,
+        topic: "Structure 2.4",
+        explanation: "Water can form Hydrogen bonds, which are much stronger than the dipole-dipole forces in H₂S."
+    },
+    {
+        q: "Which substance is likely soluble in water?",
+        options: ["Hexane (Non-polar)", "Ethanol (Polar + H-bond)", "Oil", "Diamond"],
+        correct: 1,
+        topic: "Structure 2.4",
+        explanation: "Like dissolves like. Water is polar; Ethanol is polar and can form H-bonds with water."
+    },
+    {
+        q: "Strength of London forces increases with:",
+        options: ["Fewer electrons", "Increasing molar mass/electrons", "Higher temperature", "Smaller surface area"],
+        correct: 1,
+        topic: "Structure 2.4",
+        explanation: "More electrons lead to greater polarizability, creating stronger temporary dipoles."
+    },
+    {
+        q: "Fullerenes (C₆₀) are:",
+        options: ["Giant covalent", "Ionic", "Molecular covalent", "Metallic"],
+        correct: 2,
+        topic: "Structure 2.4",
+        explanation: "C₆₀ exists as distinct 'buckyball' molecules held by weak London forces, unlike the continuous lattice of diamond."
+    },
+    {
+        q: "Which solid is soft and has a low melting point?",
+        options: ["NaCl", "Fe", "Diamond", "I₂ (Iodine)"],
+        correct: 3,
+        topic: "Structure 2.4",
+        explanation: "Iodine is a simple molecular solid held by weak London forces, making it soft with a low sublimation/melting point."
+    }
+];
+
+class QuizGame {
+    constructor(questions) {
+        this.allQuestions = questions;
+        this.questions = [];
+        this.currentIndex = 0;
+        this.score = 0;
+        this.streak = 0;
+        this.timerInterval = null;
+        this.startTime = null;
+        this.selectedOptionIndex = null;
+    }
+
+    shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    start() {
+        this.questions = this.shuffle([...this.allQuestions]);
+        this.currentIndex = 0;
+        this.score = 0;
+        this.streak = 0;
+        this.startTime = Date.now();
+        
+        document.getElementById('start-screen').classList.remove('active');
+        document.getElementById('quiz-screen').classList.add('active');
+        
+        // 90 minutes = 90 * 60 seconds
+        this.startTimer(90 * 60); 
+        this.renderQuestion();
+    }
+
+    startTimer(durationSeconds) {
+        let timer = durationSeconds, hours, minutes, seconds;
+        const display = document.getElementById('timer');
+        
+        this.timerInterval = setInterval(() => {
+            hours = parseInt(timer / 3600, 10);
+            minutes = parseInt((timer % 3600) / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = hours + ":" + minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                this.endGame();
+            }
+        }, 1000);
+    }
+
+    renderQuestion() {
+        const q = this.questions[this.currentIndex];
+        this.selectedOptionIndex = null;
+        
+        // Update UI
+        document.getElementById('q-text').textContent = q.q;
+        document.getElementById('q-topic').textContent = q.topic;
+        
+        // Update Progress
+        const percent = (this.currentIndex / this.questions.length) * 100;
+        document.getElementById('progress-bar').style.width = percent + "%";
+
+        // Render Options
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<b>${String.fromCharCode(65 + index)}.</b> ${opt}`;
+            btn.onclick = () => this.selectOption(index, btn);
+            container.appendChild(btn);
+        });
+
+        // Reset Footer/Buttons
+        document.getElementById('feedback-footer').style.display = 'none';
+        document.getElementById('feedback-footer').className = ''; 
+        document.getElementById('main-action-btn').style.display = 'block';
+        document.getElementById('main-action-btn').disabled = true;
+    }
+
+    selectOption(index, btnElement) {
+        // Deselect others
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        // Select this
+        btnElement.classList.add('selected');
+        
+        this.selectedOptionIndex = index;
+        document.getElementById('main-action-btn').disabled = false;
+    }
+
+    checkAnswer() {
+        const q = this.questions[this.currentIndex];
+        const isCorrect = this.selectedOptionIndex === q.correct;
+        const options = document.querySelectorAll('.option-btn');
+
+        // Visual Feedback on Options
+        options[this.selectedOptionIndex].classList.remove('selected');
+        if (isCorrect) {
+            options[this.selectedOptionIndex].classList.add('correct');
+            this.score++;
+            this.streak++;
+            this.showFeedback(true, q.explanation);
+        } else {
+            options[this.selectedOptionIndex].classList.add('wrong');
+            options[q.correct].classList.add('correct'); // Show right answer
+            this.streak = 0;
+            this.showFeedback(false, q.explanation);
+        }
+
+        // Update Streak UI
+        document.getElementById('streak').textContent = `🔥 ${this.streak}`;
+        
+        // Hide Check Button
+        document.getElementById('main-action-btn').style.display = 'none';
+    }
+
+    showFeedback(isCorrect, explanationText) {
+        const footer = document.getElementById('feedback-footer');
+        const title = document.getElementById('feedback-title');
+        const explDiv = document.getElementById('feedback-explanation');
+        
+        footer.style.display = 'flex';
+        
+        if (isCorrect) {
+            footer.classList.add('correct');
+            title.innerHTML = "✅ Correct!";
+        } else {
+            footer.classList.add('wrong');
+            title.innerHTML = "❌ Incorrect";
+        }
+        
+        explDiv.textContent = explanationText;
+    }
+
+    nextQuestion() {
+        this.currentIndex++;
+        if (this.currentIndex < this.questions.length) {
+            this.renderQuestion();
+        } else {
+            this.endGame();
+        }
+    }
+
+    endGame() {
+        clearInterval(this.timerInterval);
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('end-screen').classList.add('active');
+
+        // Calculate Time
+        const now = Date.now();
+        const elapsed = Math.floor((now - this.startTime) / 1000);
+        const mins = Math.floor(elapsed / 60);
+        const secs = elapsed % 60;
+        
+        document.getElementById('final-score').textContent = `${this.score} / ${this.questions.length}`;
+        document.getElementById('final-percent').textContent = Math.round((this.score / this.questions.length) * 100) + "%";
+        document.querySelector('#end-screen .summary-stat:last-child span:first-child').textContent = "Time Taken";
+        document.getElementById('final-time').textContent = `${mins}m ${secs}s`;
+    }
+}
+
+// Initialize Game
+const game = new QuizGame(db);
+
+</script>
+</body>
+</html>
