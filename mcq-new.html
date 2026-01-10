@@ -61,7 +61,7 @@
             </div>
             
             <div class="bg-gray-50 rounded-2xl p-6 mt-6 text-left space-y-3">
-                <div class="flex items-center gap-3"><span class="text-2xl">📚</span><span class="text-gray-700"><strong>30 Questions</strong> per quiz</span></div>
+                <div class="flex items-center gap-3"><span class="text-2xl">📚</span><span class="text-gray-700"><strong>60 Questions</strong> per quiz</span></div>
                 <div class="flex items-center gap-3"><span class="text-2xl">🎯</span><span class="text-gray-700"><strong>50% Medium, 30% Hard, 20% Easy</strong></span></div>
                 <div class="flex items-center gap-3"><span class="text-2xl">🔄</span><span class="text-gray-700"><strong>Repeat</strong> wrong answers</span></div>
                 <div class="flex items-center gap-3"><span class="text-2xl">📊</span><span class="text-gray-700"><strong>Track</strong> your progress</span></div>
@@ -126,7 +126,7 @@
             <h1 class="text-4xl font-black text-gray-800">Quiz Complete!</h1>
             
             <div id="final-score" class="text-6xl font-black text-green-600">
-                0/30
+                0/60
             </div>
             
             <div class="space-y-3">
@@ -4026,20 +4026,19 @@
                 localStorage.setItem(`ibchem_${this.state.userName}`, JSON.stringify(this.state.userStats));
             },
 
-            generateQuiz() {
-                const easy = QUESTIONS_DB.filter(q => q.difficulty === 'easy');
-                const medium = QUESTIONS_DB.filter(q => q.difficulty === 'medium');
-                const hard = QUESTIONS_DB.filter(q => q.difficulty === 'hard');
+      generateQuiz() {
+    const easy = QUESTIONS_DB.filter(q => q.difficulty === 'easy');
+    const medium = QUESTIONS_DB.filter(q => q.difficulty === 'medium');
+    const hard = QUESTIONS_DB.filter(q => q.difficulty === 'hard');
+    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
-                const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
-                
-                // 6 Easy, 15 Medium, 9 Hard = 30 Questions
-                return [
-                    ...shuffle(easy).slice(0, 6),
-                    ...shuffle(medium).slice(0, 15),
-                    ...shuffle(hard).slice(0, 9)
-                ].sort(() => Math.random() - 0.5);
-            },
+    // 12 Easy (~20%), 30 Medium (~50%), 18 Hard (~30%) = 60 Questions
+    return [
+        ...shuffle(easy).slice(0, 12),
+        ...shuffle(medium).slice(0, 30),
+        ...shuffle(hard).slice(0, 18)
+    ].sort(() => Math.random() - 0.5);
+}
 
             startQuiz() {
                 this.state.currentQuiz = this.generateQuiz();
@@ -4061,8 +4060,8 @@
                 
                 // Update Progress UI
                 document.getElementById('progress-bar').style.width = `${progress}%`;
-                document.getElementById('question-counter').innerText = `Q ${this.state.currentIndex + 1}/${this.state.currentQuiz.length}`;
-                document.getElementById('score-counter').innerText = `🔥 Score: ${this.state.currentScore}/30`;
+               document.getElementById('question-counter').innerText = `Q ${this.state.currentIndex + 1}/${this.state.currentQuiz.length}`;
+document.getElementById('score-counter').innerText = `🔥 Score: ${this.state.currentScore}/${this.state.currentQuiz.length}`;
                 
                 // Update Question Text
                 document.getElementById('topic-badge').innerText = `${current.topic} • ${current.difficulty.toUpperCase()}`;
@@ -4213,7 +4212,7 @@
                 
                 this.state.userStats.totalQuizzes++;
                 this.state.userStats.totalScore += this.state.currentScore;
-                this.state.userStats.totalQuestions += 30; // Base questions count
+                this.state.userStats.totalQuestions += 60; // Base questions count
                 this.state.userStats.totalTime += timeTaken;
                 this.state.userStats.history.push({
                     date: new Date().toISOString(),
