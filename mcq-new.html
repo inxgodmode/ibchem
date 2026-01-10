@@ -4024,19 +4024,22 @@
             },
 
       generateQuiz() {
-    const easy = QUESTIONS_DB.filter(q => q.difficulty === 'easy');
-    const medium = QUESTIONS_DB.filter(q => q.difficulty === 'medium');
-    const hard = QUESTIONS_DB.filter(q => q.difficulty === 'hard');
-    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+    const easy     = QUESTIONS_DB.filter(q => q.difficulty === 'easy');
+    const medium   = QUESTIONS_DB.filter(q => q.difficulty === 'medium');
+    const hard     = QUESTIONS_DB.filter(q => q.difficulty === 'hard');
+    const veryHard = QUESTIONS_DB.filter(q => q.difficulty === 'very hard');
 
-    // 12 Easy (~20%), 30 Medium (~50%), 18 Hard (~30%) = 60 Questions
+    const shuffle = arr => arr.sort(() => Math.random() - 0.5);
+
+    // Suggested distribution for 60 questions (adjust slices as you like):
+    // ~17% easy, ~40% medium, ~25% hard, ~18% very hard
     return [
-        ...shuffle(easy).slice(0, 12),
-        ...shuffle(medium).slice(0, 30),
-        ...shuffle(hard).slice(0, 18)
+        ...shuffle(easy).slice(0, 10),
+        ...shuffle(medium).slice(0, 24),
+        ...shuffle(hard).slice(0, 15),
+        ...shuffle(veryHard).slice(0, 11)
     ].sort(() => Math.random() - 0.5);
-},
-
+}
             startQuiz() {
                 this.state.currentQuiz = this.generateQuiz();
                 this.state.currentIndex = 0;
